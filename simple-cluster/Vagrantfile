@@ -1,61 +1,53 @@
 # Vagrantfile
 
+# Load external variables file
+require './variables'
+
 Vagrant.configure("2") do |config|
 
   # VM 1 configuration (Master node)
-  config.vm.define "k8s-master-01" do |master|
+  config.vm.define Variables::MASTER_NAME do |master|
     master.vm.box = "ubuntu/jammy64"
-    master.vm.hostname = "k8s-master-01"
+    master.vm.hostname = Variables::MASTER_NAME
     
     # Network settings with static IP for master and host-only adapter
-    master.vm.network "private_network", ip: "192.168.56.10"
+    master.vm.network "private_network", ip: Variables::MASTER_IP
 
-    # Persistent network configuration for gateway and DNS
-    master.vm.provision "shell", inline: <<-SHELL
-      echo "network:
-        version: 2
-        renderer: networkd
-        ethernets:
-          enp0s8:
-            dhcp4: no
-            addresses: [192.168.56.10/24]
-            gateway4: 192.168.56.2
-            nameservers:
-              addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
-      sudo netplan apply
-      sudo apt update && sudo apt upgrade -y
-    SHELL
+    # Configure network
+    master.vm.provision "shell" do |network|
+      network.path = Variables::NETWORK_CONFIGURATION_SCRIPT_PATH
+      network.env = { "IP_ADDRESS" => Variables::MASTER_IP }
+    end
+
+    master.vm.provider "virtualbox" do |vb|
+      vb.name = Variables::MASTER_NAME  # Set VirtualBox VM name
+    end
   end
 
   # VM 2 configuration (Worker node)
-  config.vm.define "k8s-worker-01" do |worker|
+  config.vm.define Variables::WORKER_NAME do |worker|
     worker.vm.box = "ubuntu/jammy64"
-    worker.vm.hostname = "k8s-worker-01"
+    worker.vm.hostname = Variables::WORKER_NAME
 
     # Network settings with static IP for worker and host-only adapter
-    worker.vm.network "private_network", ip: "192.168.56.20"
+    worker.vm.network "private_network", ip: Variables::WORKER_IP
 
-    # Persistent network configuration for gateway and DNS
-    worker.vm.provision "shell", inline: <<-SHELL
-      echo "network:
-        version: 2
-        renderer: networkd
-        ethernets:
-          enp0s8:
-            dhcp4: no
-            addresses: [192.168.56.20/24]
-            gateway4: 192.168.56.2
-            nameservers:
-              addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
-      sudo netplan apply
-      sudo apt update && sudo apt upgrade -y
-    SHELL
+    # Configure network
+    worker.vm.provision "shell" do |s|
+      s.path = Variables::NETWORK_CONFIGURATION_SCRIPT_PATH
+      s.env = { "IP_ADDRESS" => Variables::WORKER_IP }
+    end
+
+    worker.vm.provider "virtualbox" do |vb|
+      vb.name = Variables::WORKER_NAME  # Set VirtualBox VM name
+    end
   end
 
   # Provider configuration for VirtualBox using Linked Clones and updated resources
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "8192"  # 8 GB RAM
-    vb.cpus = 4         # 4 CPUs
+    vb.memory = Variables::MEMORY
+    vb.cpus = Variables::CPU
+    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
     vb.linked_clone = true
   end
 
