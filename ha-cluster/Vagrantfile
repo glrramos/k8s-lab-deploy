@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   # Loop to deploy masters
   (1..3).each do |i|
     config.vm.define Variables::MASTER_NAMES[i - 1] do |master|
-      master.vm.box = "ubuntu/jammy64"
+      master.vm.box = Variables::BOX
       master.vm.hostname = Variables::MASTER_NAMES[i - 1]
       
       # Use the IP addresses for each master
@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
   # Loop to deploy workers
   (1..3).each do |i|
     config.vm.define Variables::WORKER_NAMES[i - 1] do |worker|
-      worker.vm.box = "ubuntu/jammy64"
+      worker.vm.box = Variables::BOX
       worker.vm.hostname = Variables::WORKER_NAMES[i - 1]
       
       # Use the IP addresses for each worker
@@ -38,7 +38,7 @@ Vagrant.configure("2") do |config|
       # Provisioning: pass VM_IP as an environment variable
       worker.vm.provision "shell" do |network|
         network.path = Variables::NETWORK_CONFIGURATION_SCRIPT_PATH
-        network.env = { "VM_IP" => Variables::WORKER_IPS[i - 1] }
+        network.env = { "IP_ADDRESS" => Variables::WORKER_IPS[i - 1] }
       end
 
       worker.vm.provider "virtualbox" do |vb|
@@ -49,9 +49,13 @@ Vagrant.configure("2") do |config|
 
   # Provider configuration for VirtualBox using Linked Clones and updated resources
   config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+    vb.customize ['modifyvm', :id, '--cpu-profile', 'host']
+    vb.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
+
     vb.memory = Variables::MEMORY
     vb.cpus = Variables::CPU
-    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+
     vb.linked_clone = true
   end
 

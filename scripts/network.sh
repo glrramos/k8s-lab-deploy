@@ -21,6 +21,3 @@ sudo chmod 600 /etc/netplan/01-netcfg.yaml
 
 # Apply the network configuration
 sudo netplan apply
-
-# Update and upgrade the system
-sudo apt update && sudo apt upgrade -y

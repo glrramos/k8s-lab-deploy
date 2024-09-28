@@ -7,7 +7,7 @@ Vagrant.configure("2") do |config|
 
   # VM 1 configuration (Master node)
   config.vm.define Variables::MASTER_NAME do |master|
-    master.vm.box = "ubuntu/jammy64"
+    master.vm.box = Variables::BOX
     master.vm.hostname = Variables::MASTER_NAME
     
     # Network settings with static IP for master and host-only adapter
@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
 
   # VM 2 configuration (Worker node)
   config.vm.define Variables::WORKER_NAME do |worker|
-    worker.vm.box = "ubuntu/jammy64"
+    worker.vm.box = Variables::BOX
     worker.vm.hostname = Variables::WORKER_NAME
 
     # Network settings with static IP for worker and host-only adapter
@@ -45,9 +45,13 @@ Vagrant.configure("2") do |config|
 
   # Provider configuration for VirtualBox using Linked Clones and updated resources
   config.vm.provider "virtualbox" do |vb|
+    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+    vb.customize ['modifyvm', :id, '--cpu-profile', 'host']
+    vb.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
+
     vb.memory = Variables::MEMORY
     vb.cpus = Variables::CPU
-    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+
     vb.linked_clone = true
   end
 

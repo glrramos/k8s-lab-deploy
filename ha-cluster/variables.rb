@@ -1,7 +1,13 @@
 # Configuration variables
 module Variables
 
+    BOX = "alvistack/ubuntu-24.04" # !! Use a Ubuntu BOX for VirtualBox !!
+    #BOX = "ubuntu/jammy64"
+
     NETWORK_CONFIGURATION_SCRIPT_PATH = "../scripts/network.sh"
+    SETUP_MASTER_SCRIPT_PATH = "../scripts/setup-master.sh"
+    JOIN_MASTER_SCRIPT_PATH = "../scripts/join-master.sh"
+    JOIN_WORKER_SCRIPT_PATH = "../scripts/join-worker.sh"
 
     MASTER_NAMES = [
         "k8s-master-01",
