@@ -8,8 +8,7 @@ Vagrant.configure("2") do |config|
     master.vm.hostname = "k8s-master-01"
     
     # Network settings with static IP for master and host-only adapter
-    master.vm.network "private_network", ip: "192.168.56.10", 
-                        virtualbox__intnet: "VirtualBox Host-Only Ethernet Adapter"
+    master.vm.network "private_network", ip: "192.168.56.10"
 
     # Persistent network configuration for gateway and DNS
     master.vm.provision "shell", inline: <<-SHELL
@@ -34,8 +33,7 @@ Vagrant.configure("2") do |config|
     worker.vm.hostname = "k8s-worker-01"
 
     # Network settings with static IP for worker and host-only adapter
-    worker.vm.network "private_network", ip: "192.168.56.20", 
-                        virtualbox__intnet: "VirtualBox Host-Only Ethernet Adapter"
+    worker.vm.network "private_network", ip: "192.168.56.20"
 
     # Persistent network configuration for gateway and DNS
     worker.vm.provision "shell", inline: <<-SHELL
