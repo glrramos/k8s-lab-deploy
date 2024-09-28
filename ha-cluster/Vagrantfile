@@ -1,0 +1,151 @@
+# Vagrantfile
+
+VAGRANT.configure("2") do |config|
+
+    # VM 1: k8s-master-01
+    config.vm.define "k8s-master-01" do |master|
+      master.vm.box = "ubuntu/jammy64"
+      master.vm.hostname = "k8s-master-01"
+      
+      master.vm.network "private_network", ip: "192.168.56.10"
+  
+      master.vm.provision "shell", inline: <<-SHELL
+        echo "network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s8:
+              dhcp4: no
+              addresses: [192.168.56.10/24]
+              gateway4: 192.168.56.2
+              nameservers:
+                addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        sudo netplan apply
+        sudo apt update && sudo apt upgrade -y
+      SHELL
+    end
+  
+    # VM 2: k8s-master-02
+    config.vm.define "k8s-master-02" do |master|
+      master.vm.box = "ubuntu/jammy64"
+      master.vm.hostname = "k8s-master-02"
+      
+      master.vm.network "private_network", ip: "192.168.56.11"
+  
+      master.vm.provision "shell", inline: <<-SHELL
+        echo "network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s8:
+              dhcp4: no
+              addresses: [192.168.56.11/24]
+              gateway4: 192.168.56.2
+              nameservers:
+                addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        sudo netplan apply
+        sudo apt update && sudo apt upgrade -y
+      SHELL
+    end
+  
+    # VM 3: k8s-master-03
+    config.vm.define "k8s-master-03" do |master|
+      master.vm.box = "ubuntu/jammy64"
+      master.vm.hostname = "k8s-master-03"
+      
+      master.vm.network "private_network", ip: "192.168.56.12"
+  
+      master.vm.provision "shell", inline: <<-SHELL
+        echo "network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s8:
+              dhcp4: no
+              addresses: [192.168.56.12/24]
+              gateway4: 192.168.56.2
+              nameservers:
+                addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        sudo netplan apply
+        sudo apt update && sudo apt upgrade -y
+      SHELL
+    end
+  
+    # VM 4: k8s-worker-01
+    config.vm.define "k8s-worker-01" do |worker|
+      worker.vm.box = "ubuntu/jammy64"
+      worker.vm.hostname = "k8s-worker-01"
+  
+      worker.vm.network "private_network", ip: "192.168.56.20"
+  
+      worker.vm.provision "shell", inline: <<-SHELL
+        echo "network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s8:
+              dhcp4: no
+              addresses: [192.168.56.20/24]
+              gateway4: 192.168.56.2
+              nameservers:
+                addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        sudo netplan apply
+        sudo apt update && sudo apt upgrade -y
+      SHELL
+    end
+  
+    # VM 5: k8s-worker-02
+    config.vm.define "k8s-worker-02" do |worker|
+      worker.vm.box = "ubuntu/jammy64"
+      worker.vm.hostname = "k8s-worker-02"
+  
+      worker.vm.network "private_network", ip: "192.168.56.21"
+  
+      worker.vm.provision "shell", inline: <<-SHELL
+        echo "network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s8:
+              dhcp4: no
+              addresses: [192.168.56.21/24]
+              gateway4: 192.168.56.2
+              nameservers:
+                addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        sudo netplan apply
+        sudo apt update && sudo apt upgrade -y
+      SHELL
+    end
+  
+    # VM 6: k8s-worker-03
+    config.vm.define "k8s-worker-03" do |worker|
+      worker.vm.box = "ubuntu/jammy64"
+      worker.vm.hostname = "k8s-worker-03"
+  
+      worker.vm.network "private_network", ip: "192.168.56.22"
+  
+      worker.vm.provision "shell", inline: <<-SHELL
+        echo "network:
+          version: 2
+          renderer: networkd
+          ethernets:
+            enp0s8:
+              dhcp4: no
+              addresses: [192.168.56.22/24]
+              gateway4: 192.168.56.2
+              nameservers:
+                addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        sudo netplan apply
+        sudo apt update && sudo apt upgrade -y
+      SHELL
+    end
+  
+    # Provider configuration for VirtualBox using Linked Clones and updated resources
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "8192"  # 8 GB RAM
+      vb.cpus = 4         # 4 CPUs
+      vb.linked_clone = true
+    end
+  
+  end
+  
