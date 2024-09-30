@@ -10,10 +10,10 @@ echo "network:
         - $IP_ADDRESS/24
       routes:
         - to: default
-          via: 192.168.56.2
+          via: $GATEWAY
       nameservers:
-        search: [fte.lab]
-        addresses: [192.168.56.2]" | sudo tee /etc/netplan/01-netcfg.yaml
+        search: [$DOMAIN]
+        addresses: [$DNS]" | sudo tee /etc/netplan/01-netcfg.yaml
 
 # Change network files permissions
 sudo chmod 600 /etc/netplan/50-vagrant.yaml
