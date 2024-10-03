@@ -72,8 +72,3 @@ systemctl enable --now kubelet
 # Add endpoint, hostname and ip do /etc/hosts (preparing for future HA if needed)
 
 echo -e "$ADVERTISE_ADDRESS $ENDPOINT_NAME $ENDPOINT_NAME.$DOMAIN\n$IP_ADDRESS $HOSTNAME $HOSTNAME.$DOMAIN" | sudo tee -a /etc/hosts
-
-# Enable bash completion for kubectl
-
-source <(kubectl completion bash)
-echo "source <(kubectl completion bash)" >> $HOME/.bashrc
