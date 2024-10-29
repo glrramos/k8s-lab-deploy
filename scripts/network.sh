@@ -21,3 +21,7 @@ sudo chmod 600 /etc/netplan/01-netcfg.yaml
 
 # Apply the network configuration
 sudo netplan apply
+
+# Add endpoint, hostname and ip do /etc/hosts (preparing for future HA if needed)
+
+echo -e "$ADVERTISE_ADDRESS $ENDPOINT_NAME $ENDPOINT_NAME.$DOMAIN\n$IP_ADDRESS $HOSTNAME $HOSTNAME.$DOMAIN" | sudo tee -a /etc/hosts

@@ -24,31 +24,38 @@ Before you begin, ensure you have the following installed on your system:
 - [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 - Ruby (for parsing the Vagrantfile)
 - Necessary Vagrant plugins (if required)
+- **pfSense:** A virtual pfSense instance can be set up as a network router. It manages routing between the host-only network, where the Kubernetes nodes reside, and the bridged network, where your Wi-Fi or LAN is, which connects to your local network or internet. This enables external access to the cluster and is particularly useful if your host and VMs are on different subnets. With out internet the VMs will not be able to install packages and kubernetes.
 
 ## Usage
 
-1. **Clone the repository:**
+1. **Configure pfSense:** Set up  a pfSense as a router between the host-only and bridged networks to have internet access. Ensure that:
+
+- The pfSense VM has interfaces in both the host-only and bridged networks.
+- Proper firewall rules are in place to allow traffic between the networks.
+
+2. **Clone the repository:**
    ```bash
    git clone https://github.com/yourusername/your-repository.git
    cd your-repository
    ```
 
-2. **Edit the `variables` file:** Configure the necessary `variables` in the variables file to match your environment and requirements. This includes settings like Kubernetes version, IP addresses, and resource allocations.
+3. **Edit the `variables` file:** Configure the necessary `variables` in the variables file to match your environment and requirements. This includes settings like Kubernetes version, IP addresses, and resource allocations.
 
-3. **Start the Vagrant environment:** To create and provision the VMs, run:
+4. **Start the Vagrant environment:** To create and provision the VMs, run:
    ```bash
    vagrant up
    ```
 
-4. **Access the master node:** You can SSH into the master node using:
+5. **Access the master node:** You can SSH into the master node using:
    ```bash
    vagrant ssh <MASTER_NAME>
    ```
 
-5. **Access the worker node:** Similarly, to SSH into the worker node:
+6. **Access the worker node:** Similarly, to SSH into the worker node:
    ```bash
-   vagrant ssh <WORKER_NAME>
+   vagrant ssh <WORKER_NAME_SUFFIX><index>
    ```
+   Replace `<index>` with the worker node number, e.g., `k8s-worker-01`.
 
 ## Configuration
 
@@ -57,13 +64,13 @@ The Vagrantfile includes the following key components:
 - Master Node Configuration:
     - Static IP configuration.
     - Shell provisioning scripts for network configuration, Kubernetes preparation, and master node setup.
-    - Kubernetes Master bootstrapped with kubeadm.
+    - Kubernetes Master bootstrapped with `kubeadm`.
     - Cilium is used as Network Plug-in.
 
 - Worker Node Configuration:
     - Static IP configuration.
     - Shell provisioning scripts for network configuration, Kubernetes preparation, and joining the worker node to the cluster.
-    - Kubernetes Worker bootstrapped with kubeadm.
+    - Kubernetes Worker bootstrapped with `kubeadm`.
 
 - VirtualBox Provider Configuration:
     - Customizes the VM settings, such as CPU, memory, and graphics controller.
@@ -73,10 +80,11 @@ The Vagrantfile includes the following key components:
 The configuration relies on several variables defined in an external `variables` file. Ensure to set the following variables:
 
 - `MASTER_NAME`: Name of the master node.
-- `WORKER_NAME`: Name of the worker node.
+- `WORKER_NAME_SUFFIX`: Prefix name for worker nodes.
+- `WORKER_COUNT`: Number of worker nodes to deploy.
 - `BOX`: The base Vagrant box to use.
 - `MASTER_IP`: Static IP for the master node.
-- `WORKER_IP`: Static IP for the worker node.
+- `WORKER_STARTING_IP`: Starting IP for worker nodes.
 - `GATEWAY`: Network gateway address.
 - `DNS`: DNS server address.
 - `DOMAIN`: Domain name for the cluster.
@@ -96,14 +104,14 @@ This script configures the network settings for the master and worker nodes usin
 
 - **Network Configuration:** It sets up a private network interface with a static IP and routing.
 - **Permissions**: Changes permissions for network configuration files.
-- **Application of Configuration:** Applies the network configuration using netplan apply.
+- **Application of Configuration:** Applies the network configuration using `netplan apply`.
 
 **`k8s-preparation.sh`**
 
 This script prepares the system for Kubernetes installation.
 
 - **System Update:** Updates package repositories and upgrades the system.
-- **Package Installation:** Installs necessary packages, including kubelet, kubeadm, and kubectl.
+- **Package Installation:** Installs necessary packages, including `kubelet`, `kubeadm`, and `kubectl`.
 - **Swap Disablement:** Disables swap to meet Kubernetes requirements.
 - **Kernel Module Loading:** Loads necessary kernel modules for container runtime.
 - **Container Runtime Configuration:** Installs and configures `containerd` with required settings.
@@ -114,9 +122,9 @@ This script prepares the system for Kubernetes installation.
 
 This script sets up the master node and initializes the Kubernetes cluster.
 
-- **Kubernetes Initialization:** Initializes the Kubernetes cluster using kubeadm init with a generated configuration file.
+- **Kubernetes Initialization:** Initializes the Kubernetes cluster using `kubeadm init` with a generated configuration file.
 - **Cilium Installation:** Installs Cilium as the pod network plugin using Helm.
-- **Join Command Generation:** Saves the kubeadm join command for worker nodes in a script named `join-worker.sh`.
+- **Join Command Generation:** Saves the `kubeadm join` command for worker nodes in a script named `join-worker.sh`.
 - **Kubernetes Configuration:** Configures the `kubectl` CLI for the Vagrant user to manage the cluster.
 
 **`join-worker.sh`**
@@ -153,3 +161,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Added the text about editing the `variables` file to the **Usage**.
 - Added a new **Scripts** section with descriptions for `network.sh`, `k8s-preparation.sh`, `setup-master.sh`, and `join-worker.sh`.
+- Added **pfSense** as a prerequisite and described its routing role between host-only and bridged networks.
+- Updated instructions for accessing worker nodes based on dynamic node names generated with the `WORKER_NAME_SUFFIX`.

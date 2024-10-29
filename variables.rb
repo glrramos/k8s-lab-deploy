@@ -12,18 +12,19 @@ module Variables
     JOIN_WORKER_SCRIPT_PATH = "./scripts/join-worker.sh"
 
     # Kubernetes Specific Configurations
-    ENDPOINT_NAME = "k8s-master"
+    ENDPOINT_NAME = "k8s"
     KUBERNETES_VERSION = "1.30"
-    ADVERTISE_ADDRESS = "192.168.56.10"
+    ADVERTISE_ADDRESS = "192.168.56.11"
     POD_SUBNET = "10.0.0.0/16"
     CILIUM_VERSION = "1.16.2"
 
     # Network configurations
     MASTER_NAME = "k8s-master-01"
-    MASTER_IP = "192.168.56.10"
+    MASTER_IP = "192.168.56.11"
 
-    WORKER_NAME = "k8s-worker-01"
-    WORKER_IP = "192.168.56.20"
+    WORKER_COUNT = 2
+    WORKER_NAME_SUFFIX = "k8s-worker-"
+    WORKER_STARTING_IP = "192.168.56.21"
 
     GATEWAY = "192.168.56.2"
     DNS = "192.168.56.2"
